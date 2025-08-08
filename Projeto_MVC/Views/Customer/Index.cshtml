@@ -4,7 +4,8 @@
     ViewData["Title"] = "Início";
 }
 
-<h1>Index</h1>
+
+<h1>Tabela de clientes</h1>
 
 <p>
     <a asp-action="Create">Criar Novo</a>
@@ -13,16 +14,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Id)
+                @Html.DisplayNameFor(model => model.id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                Nome
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Job)
+                Profissão
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Age)
+                Idade
             </th>
             <th></th>
         </tr>
@@ -31,21 +32,23 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Id)
+                @Html.DisplayFor(modelItem => item.id)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Job)
+                @Html.DisplayFor(modelItem => item.job)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Age)
+                @Html.DisplayFor(modelItem => item.age)
             </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            <td class="d-inline-flex">
+                <a asp-controller="Customer" asp-action="Edit" asp-route-id="@item.id" class="btn btn-sm btn-outline-success">Editar</a>
+                <a asp-controller="Customer" asp-action="Details" asp-route-id="@item.id" class="btn btn-sm btn-outline-info">Detalhes</a>
+                <form asp-controller="Customer" asp-action="Delete" asp-route-id="@item.id" onclick="confirm('Deseja excluir o usuário @item.name')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Deletar</button>
+                </form>
             </td>
         </tr>
 }
