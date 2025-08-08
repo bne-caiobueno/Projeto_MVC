@@ -1,14 +1,14 @@
-﻿@model Projeto_MVC.Models.Users
+﻿@model Projeto_MVC.Models.Customers
 
 @{
-    ViewData["Title"] = "Registro";
+    ViewData["Title"] = "Editar";
 }
 
-<h4>Criar conta</h4>
+<h1>Editar</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="name" class="control-label"></label>
@@ -16,24 +16,24 @@
                 <span asp-validation-for="name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="email" class="control-label"></label>
-                <input asp-for="email" type="email" class="form-control" />
-                <span asp-validation-for="email" class="text-danger"></span>
+                <label asp-for="job" class="control-label"></label>
+                <input asp-for="job" class="form-control" />
+                <span asp-validation-for="job" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="password" class="control-label"></label>
-                <input asp-for="password" type="password" class="form-control" />
-                <span asp-validation-for="password" class="text-danger"></span>
+                <label asp-for="age" class="control-label"></label>
+                <input asp-for="age" class="form-control" />
+                <span asp-validation-for="age" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Criar" class="btn btn-primary" />
+                <input type="submit" value="Editar" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Login">Voltar</a>
+    <a asp-action="Index">Voltar para a tabela</a>
 </div>
 
 @section Scripts {

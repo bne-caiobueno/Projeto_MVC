@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Projeto_MVC.Models;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Npgsql;
+using Projeto_MVC.Models;
 using System.Data;
-using Dapper;
+using System.Security.Claims;
 
 namespace Projeto_MVC.Controllers
 {
@@ -21,32 +25,49 @@ namespace Projeto_MVC.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(string email, string password)
+        public async Task<IActionResult> Login(Users user)
         {
             IDbConnection con;
             try
             {
-                string getEmailQuery = $"SELECT * FROM users WHERE email = '{email}'";
+                string getEmailQuery = $"SELECT * FROM users WHERE email = '{user.email}'";
                 con = new NpgsqlConnection(connectionString);
                 con.Open();
-                Users userLogin = con.Query(getEmailQuery).First();
+                Users userLogin = con.Query<Users>(getEmailQuery).FirstOrDefault();
                 con.Close();
                 if(userLogin == null)
                 {
-                    throw new Exception("Email não encontrado!");
+                    TempData["msg"] = "Email não encontrado!";
+                    return View();
                 }
-                if (userLogin.password != password) 
+                if (userLogin.password != user.password) 
                 {
-                    throw new Exception("Email ou senha incorretos!");
+                    TempData["msg"] = "Email ou senha incorretos!";
+                    return View();
                 }
 
-                //usuário logado
+                var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, userLogin.name),
+                new Claim("UserType", "Admin")
+            };
+
+                var claimsIdentity = new ClaimsIdentity(claims, "CookieAuth");
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                await HttpContext.SignInAsync("CookieAuth", claimsPrincipal);
+                return RedirectToAction("Index", "Customer");
             }
             catch (Exception ex)
             {
-                throw ex;
+                 throw ex;
             }
 
+            return View();
+        }
+
+        public IActionResult AccessDenied()
+        {
             return View();
         }
 
@@ -65,12 +86,12 @@ namespace Projeto_MVC.Controllers
 
                 try
                 {
-                    string insertQuery = "INSERT INTO users(Name,Email,Password) VALUES(@name,@email,@password)";
+                    string insertQuery = "INSERT INTO users(name,email,password) VALUES(@name,@email,@password)";
                     con = new NpgsqlConnection(connectionString);
                     con.Open();
                     con.Execute(insertQuery, user);
                     con.Close();
-                    return RedirectToAction(nameof(Create));
+                    return RedirectToAction("Login");
                 }
                 catch (Exception ex)
                 {
@@ -81,6 +102,11 @@ namespace Projeto_MVC.Controllers
             return View();
         }
 
-
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("CookieAuth");
+            return RedirectToAction("Login");
+        }
     }
 }
